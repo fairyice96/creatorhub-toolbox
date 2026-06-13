@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CreatorHub 創作者全能工具箱</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: rgba(16, 23, 39, 0.72);
+      --panel-strong: rgba(19, 29, 49, 0.9);
+      --glass: rgba(255, 255, 255, 0.075);
+      --line: rgba(148, 163, 184, 0.18);
+      --text: #e5edf8;
+      --muted: #91a2bb;
+      --cyan: #38d5ff;
+      --blue: #4f8dff;
+      --purple: #9b6dff;
+      --pink: #ff5fd2;
+      --green: #42f5a7;
+      --danger: #ff6b8a;
+      --shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(79, 141, 255, 0.22), transparent 30%),
+        radial-gradient(circle at 86% 12%, rgba(155, 109, 255, 0.18), transparent 34%),
+        radial-gradient(circle at 78% 85%, rgba(56, 213, 255, 0.13), transparent 36%),
+        #0b0f19;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      content: "";
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.72), transparent 76%);
+    }
+
+    body::after {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      background:
+        linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.035), transparent),
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 46%);
+      opacity: 0.75;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 24px;
+      width: min(1440px, calc(100vw - 40px));
+      min-height: calc(100vh - 40px);
+      margin: 20px auto;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 20px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 40px);
+      padding: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(165deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035)),
+        rgba(10, 15, 28, 0.62);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.11);
+      backdrop-filter: blur(26px) saturate(150%);
+    }
+
+    .sidebar::before {
+      position: absolute;
+      top: -90px;
+      right: -70px;
+      width: 190px;
+      height: 190px;
+      content: "";
+      background: radial-gradient(circle, rgba(56, 213, 255, 0.28), transparent 70%);
+      filter: blur(8px);
+    }
+
+    .brand {
+      position: relative;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(56, 213, 255, 0.96), rgba(155, 109, 255, 0.92)),
+        #162033;
+      box-shadow: 0 16px 42px rgba(56, 213, 255, 0.2);
+      color: #06101b;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .nav-label {
+      margin: 4px 4px 12px;
+      color: #66758e;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .nav-list {
+      position: relative;
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      position: relative;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: center;
+      min-height: 68px;
+      padding: 12px;
+      text-align: left;
+      border: 1px solid transparent;
+      border-radius: 20px;
+      background: transparent;
+      transition: transform 240ms var(--ease), background 240ms var(--ease), border-color 240ms var(--ease);
+    }
+
+    .nav-btn:hover {
+      transform: translateX(3px);
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.055);
+    }
+
+    .nav-btn.active {
+      border-color: rgba(56, 213, 255, 0.34);
+      background:
+        linear-gradient(135deg, rgba(56, 213, 255, 0.16), rgba(155, 109, 255, 0.12)),
+        rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 18px 34px rgba(24, 35, 60, 0.28);
+    }
+
+    .nav-icon {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.075);
+      color: var(--cyan);
+      font-size: 20px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-title {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-desc {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 7px 10px;
+      border: 1px solid rgba(66, 245, 167, 0.25);
+      border-radius: 999px;
+      color: #b7ffdf;
+      background: rgba(66, 245, 167, 0.08);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 16px var(--green);
+    }
+
+    .footer-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 8px 0;
+    }
+
+    .hero {
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      padding: 24px 6px 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      border: 1px solid rgba(56, 213, 255, 0.22);
+      border-radius: 999px;
+      color: #b9ecff;
+      background: rgba(56, 213, 255, 0.08);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 58px);
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(100deg, #eaf7ff 10%, #8be4ff 38%, #b497ff 72%, #ff8ee1);
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .hero-meter {
+      flex: 0 0 250px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.055);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .meter-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 11px;
+      color: #cdd8eb;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .meter-bar {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .meter-fill {
+      width: 86%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+      box-shadow: 0 0 26px rgba(56, 213, 255, 0.35);
+    }
+
+    .workspace {
+      position: relative;
+      min-height: 690px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035)),
+        rgba(9, 14, 27, 0.72);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+    }
+
+    .workspace::before {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      background:
+        radial-gradient(circle at 10% 0%, rgba(56, 213, 255, 0.1), transparent 32%),
+        radial-gradient(circle at 90% 10%, rgba(155, 109, 255, 0.11), transparent 38%);
+    }
+
+    .panel {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: none;
+      padding: clamp(22px, 3vw, 36px);
+      opacity: 0;
+      transform: translateY(16px) scale(0.985);
+      transition: opacity 320ms var(--ease), transform 320ms var(--ease);
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .panel.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .panel-header {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .panel-kicker {
+      margin: 0 0 8px;
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: clamp(25px, 3vw, 38px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+
+    .panel-summary {
+      max-width: 680px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.85fr) minmax(330px, 1.15fr);
+      gap: 18px;
+    }
+
+    .tool-grid.single {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      position: relative;
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.035)),
+        rgba(13, 20, 35, 0.82);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 50px rgba(0, 0, 0, 0.18);
+    }
+
+    .card-title-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .drop-zone {
+      display: grid;
+      min-height: 210px;
+      margin: 16px 0;
+      padding: 24px;
+      place-items: center;
+      text-align: center;
+      border: 1px dashed rgba(56, 213, 255, 0.36);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(56, 213, 255, 0.08), rgba(155, 109, 255, 0.07)),
+        rgba(255, 255, 255, 0.035);
+      transition: border-color 220ms var(--ease), background 220ms var(--ease), transform 220ms var(--ease);
+    }
+
+    .drop-zone.dragover {
+      transform: translateY(-2px);
+      border-color: rgba(66, 245, 167, 0.78);
+      background: rgba(66, 245, 167, 0.08);
+    }
+
+    .drop-icon {
+      display: grid;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 14px;
+      place-items: center;
+      border-radius: 24px;
+      background: rgba(56, 213, 255, 0.12);
+      color: var(--cyan);
+      font-size: 32px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .drop-zone strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .hidden-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.065);
+      color: #dce8fb;
+      font-size: 13px;
+      font-weight: 850;
+      transition: transform 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(56, 213, 255, 0.38);
+      background: rgba(56, 213, 255, 0.095);
+    }
+
+    .btn.primary {
+      border-color: rgba(56, 213, 255, 0.38);
+      background: linear-gradient(135deg, rgba(56, 213, 255, 0.95), rgba(79, 141, 255, 0.88));
+      color: #04121f;
+      box-shadow: 0 14px 34px rgba(56, 213, 255, 0.2);
+    }
+
+    .btn.ghost {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .field label,
+    .control-label {
+      color: #c9d5e8;
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      outline: none;
+      border-radius: 17px;
+      background: rgba(4, 9, 18, 0.54);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: border-color 180ms var(--ease), box-shadow 180ms var(--ease), background 180ms var(--ease);
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: rgba(56, 213, 255, 0.52);
+      background: rgba(4, 9, 18, 0.74);
+      box-shadow: 0 0 0 4px rgba(56, 213, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    textarea {
+      min-height: 160px;
+      padding: 15px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    .output-box {
+      min-height: 442px;
+    }
+
+    .transcript-output {
+      min-height: 358px;
+      white-space: pre-wrap;
+    }
+
+    .segmented {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.055);
+    }
+
+    .segmented button {
+      min-width: 68px;
+      min-height: 34px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      transition: background 180ms var(--ease), color 180ms var(--ease);
+    }
+
+    .segmented button.active {
+      background: linear-gradient(135deg, rgba(56, 213, 255, 0.9), rgba(155, 109, 255, 0.82));
+      color: #07111f;
+    }
+
+    .result-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      color: #b9c8dd;
+      background: rgba(255, 255, 255, 0.045);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .social-input {
+      min-height: 132px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 0 0;
+    }
+
+    .toggle-line {
+      display: inline-flex;
+      gap: 9px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .toggle-line input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--cyan);
+    }
+
+    .font-results {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .font-card {
+      display: grid;
+      gap: 11px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .font-card-top {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .font-name {
+      color: #dce8fb;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .mini-copy {
+      min-height: 32px;
+      padding: 7px 10px;
+      border-radius: 11px;
+      font-size: 12px;
+    }
+
+    .font-preview {
+      min-height: 52px;
+      overflow-wrap: anywhere;
+      color: #eef7ff;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: minmax(290px, 0.82fr) minmax(330px, 1.18fr);
+      gap: 18px;
+    }
+
+    .control-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    input,
+    select {
+      min-height: 52px;
+      padding: 0 14px;
+    }
+
+    select {
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #9fb0c8 50%),
+        linear-gradient(135deg, #9fb0c8 50%, transparent 50%);
+      background-position:
+        calc(100% - 20px) calc(50% - 3px),
+        calc(100% - 14px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    .metric-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric-card {
+      min-height: 156px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(56, 213, 255, 0.16), transparent 42%),
+        rgba(255, 255, 255, 0.045);
+    }
+
+    .metric-label {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .metric-value span {
+      color: var(--cyan);
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .recommendation {
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid rgba(66, 245, 167, 0.18);
+      border-radius: 18px;
+      background: rgba(66, 245, 167, 0.055);
+      color: #d8ffe9;
+      line-height: 1.7;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 10;
+      max-width: min(360px, calc(100vw - 48px));
+      padding: 13px 16px;
+      border: 1px solid rgba(66, 245, 167, 0.32);
+      border-radius: 16px;
+      background: rgba(9, 18, 31, 0.88);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+      color: #d8ffe9;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 180ms var(--ease), transform 180ms var(--ease);
+      backdrop-filter: blur(18px);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1080px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        top: auto;
+        height: auto;
+      }
+
+      .nav-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .nav-btn {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero-meter {
+        width: 100%;
+        flex-basis: auto;
+      }
+
+      .workspace {
+        min-height: 860px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app-shell {
+        width: min(100vw - 24px, 1440px);
+        margin: 12px auto;
+      }
+
+      .nav-list,
+      .tool-grid,
+      .calculator-grid,
+      .metric-board,
+      .font-results {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        position: relative;
+        min-height: 0;
+      }
+
+      .panel:not(.active) {
+        display: none;
+      }
+
+      .workspace {
+        min-height: 0;
+      }
+
+      .panel-header {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="CreatorHub 工具導覽">
+      <div class="brand">
+        <div class="brand-mark">CH</div>
+        <div>
+          <h1 class="brand-title">CreatorHub</h1>
+          <p class="brand-subtitle">Creator Workstation</p>
+        </div>
+      </div>
+
+      <div class="nav-label">Core Tools</div>
+      <nav class="nav-list">
+        <button class="nav-btn active" type="button" data-target="srt" aria-controls="panel-srt">
+          <span class="nav-icon">S</span>
+          <span>
+            <span class="nav-title">SRT 字幕大師</span>
+            <span class="nav-desc">字幕清理、純文字稿、繁簡轉換</span>
+          </span>
+        </button>
+        <button class="nav-btn" type="button" data-target="fonts" aria-controls="panel-fonts">
+          <span class="nav-icon">Aa</span>
+          <span>
+            <span class="nav-title">社群字體美化</span>
+            <span class="nav-desc">10 種風格字體與 IG 空白換行</span>
+          </span>
+        </button>
+        <button class="nav-btn" type="button" data-target="bitrate" aria-controls="panel-bitrate">
+          <span class="nav-icon">4K</span>
+          <span>
+            <span class="nav-title">短影音位元率計算機</span>
+            <span class="nav-desc">Bitrate 推薦與檔案大小估算</span>
+          </span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-pill"><span class="status-dot"></span>Offline Ready</div>
+        <p class="footer-copy">所有功能皆在瀏覽器本機執行，適合創作者快速整理字幕、文案與輸出規格。</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">AI Creator Utility Console</div>
+          <h1><span>創作者全能工具箱</span></h1>
+          <p>將字幕清理、社群字體美化與短影音輸出估算集中在同一個高質感工作台。點選左側工具即可流暢切換，快速完成發布前的整理工作。</p>
+        </div>
+        <div class="hero-meter" aria-label="系統狀態">
+          <div class="meter-title"><span>Production Flow</span><span>86%</span></div>
+          <div class="meter-bar"><div class="meter-fill"></div></div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <article class="panel active visible" id="panel-srt" data-panel="srt">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Subtitle Processor</p>
+              <h2>SRT 字幕大師</h2>
+              <p class="panel-summary">拖放或上傳 .srt 檔案，自動去除時間軸與序號，整理成乾淨的逐行文字稿。可即時切換繁體與簡體中文。</p>
+            </div>
+            <div class="segmented" aria-label="繁簡轉換">
+              <button class="script-toggle active" type="button" data-script="traditional">繁體</button>
+              <button class="script-toggle" type="button" data-script="simplified">簡體</button>
+            </div>
+          </div>
+
+          <div class="tool-grid">
+            <div class="card">
+              <div class="card-title-row">
+                <h3>輸入字幕檔</h3>
+                <span class="chip" id="srtFileStatus">尚未載入</span>
+              </div>
+              <p class="hint">支援標準 .srt 格式，也可以直接貼上字幕內容進行清理。</p>
+
+              <label class="drop-zone" id="dropZone" for="srtFile">
+                <span>
+                  <span class="drop-icon">⇪</span>
+                  <strong>拖放 SRT 到這裡</strong>
+                  <span class="hint">或點擊選擇檔案</span>
+                </span>
+              </label>
+              <input class="hidden-input" id="srtFile" type="file" accept=".srt,text/plain" />
+
+              <div class="field">
+                <label for="srtRaw">原始 SRT 內容</label>
+                <textarea id="srtRaw" placeholder="1&#10;00:00:00,000 --> 00:00:02,000&#10;歡迎來到 CreatorHub"></textarea>
+              </div>
+            </div>
+
+            <div class="card output-box">
+              <div class="card-title-row">
+                <div>
+                  <h3>純文字稿輸出</h3>
+                  <div class="result-meta" id="transcriptMeta">等待字幕內容</div>
+                </div>
+                <button class="btn primary" type="button" id="copyTranscript">複製文字稿</button>
+              </div>
+              <textarea class="transcript-output" id="transcriptOutput" readonly placeholder="清理後的純文字稿會顯示在這裡。"></textarea>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="panel-fonts" data-panel="fonts">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Social Typography</p>
+              <h2>社群字體美化</h2>
+              <p class="panel-summary">輸入英文或中文，即時生成 10 種社群可用樣式。開啟 IG 空白換行後，系統會自動在每行間插入不可見空白。</p>
+            </div>
+            <span class="chip">10 Styles</span>
+          </div>
+
+          <div class="tool-grid single">
+            <div class="card">
+              <div class="field">
+                <label for="socialInput">輸入文案</label>
+                <textarea class="social-input" id="socialInput" placeholder="輸入你的標題、限動文字或貼文 caption。">CreatorHub 創作者上線
+Make your content shine</textarea>
+              </div>
+              <div class="toolbar-row">
+                <label class="toggle-line">
+                  <input id="igSpacer" type="checkbox" checked />
+                  加入 IG 換行空白
+                </label>
+                <button class="btn ghost" type="button" id="clearSocial">清空文案</button>
+              </div>
+              <div class="font-results" id="fontResults" aria-live="polite"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="panel-bitrate" data-panel="bitrate">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Video Export Calculator</p>
+              <h2>短影音位元率計算機</h2>
+              <p class="panel-summary">依影片秒數、解析度與影格率估算推薦位元率與輸出檔案大小，幫助你抓到清晰與上傳效率之間的平衡。</p>
+            </div>
+            <span class="chip">MB = Mbps × 秒 / 8</span>
+          </div>
+
+          <div class="calculator-grid">
+            <div class="card">
+              <div class="control-grid">
+                <div class="field">
+                  <label for="videoSeconds">影片時間（秒）</label>
+                  <input id="videoSeconds" type="number" min="1" step="1" value="60" />
+                </div>
+                <div class="field">
+                  <label for="resolution">預期解析度</label>
+                  <select id="resolution">
+                    <option value="1080p">1080p</option>
+                    <option value="4K">4K</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="fps">影格率</label>
+                  <select id="fps">
+                    <option value="30">30fps</option>
+                    <option value="60">60fps</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="metric-board">
+                <div class="metric-card">
+                  <p class="metric-label">Recommended Bitrate</p>
+                  <p class="metric-value"><span id="bitrateValue">12</span> <span>Mbps</span></p>
+                  <p class="metric-note" id="bitrateNote">1080p / 30fps 社群發布推薦值</p>
+                </div>
+                <div class="metric-card">
+                  <p class="metric-label">Estimated Size</p>
+                  <p class="metric-value"><span id="sizeValue">90</span> <span>MB</span></p>
+                  <p class="metric-note" id="sizeNote">依目前影片秒數估算</p>
+                </div>
+              </div>
+              <div class="recommendation" id="exportAdvice">建議輸出 H.264 或 HEVC，保留足夠位元率後再上傳平台，可降低二次壓縮造成的細節損失。</div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">已複製</div>
+
+  <script>
+    const state = {
+      currentPanel: "srt",
+      currentScript: "traditional",
+      transcriptTraditional: "",
+      toastTimer: null
+    };
+
+    const bitrateTable = {
+      "1080p": {
+        "30": { mbps: 12, label: "1080p / 30fps 社群發布推薦值" },
+        "60": { mbps: 20, label: "1080p / 60fps 高動態畫面推薦值" }
+      },
+      "4K": {
+        "30": { mbps: 45, label: "4K / 30fps 高畫質輸出推薦值" },
+        "60": { mbps: 68, label: "4K / 60fps 高動態高解析推薦值" }
+      }
+    };
+
+    const t2sPairs = [
+      ["創", "创"], ["作者", "作者"], ["全", "全"], ["能", "能"], ["工具", "工具"], ["箱", "箱"],
+      ["歡", "欢"], ["來", "来"], ["這", "这"], ["裡", "里"], ["個", "个"], ["們", "们"],
+      ["會", "会"], ["與", "与"], ["為", "为"], ["於", "于"], ["對", "对"], ["後", "后"],
+      ["時", "时"], ["間", "间"], ["軸", "轴"], ["號", "号"], ["輸", "输"], ["出", "出"],
+      ["檔", "档"], ["案", "案"], ["複", "复"], ["製", "制"], ["鈕", "钮"], ["繁", "繁"],
+      ["簡", "简"], ["轉", "转"], ["換", "换"], ["體", "体"], ["中", "中"], ["文", "文"],
+      ["社", "社"], ["群", "群"], ["字", "字"], ["美", "美"], ["化", "化"], ["種", "种"],
+      ["樣", "样"], ["式", "式"], ["動", "动"], ["態", "态"], ["導", "导"], ["覽", "览"],
+      ["列", "列"], ["設", "设"], ["計", "计"], ["點", "点"], ["擊", "击"], ["選", "选"],
+      ["項", "项"], ["右", "右"], ["側", "侧"], ["主", "主"], ["畫", "画"], ["面", "面"],
+      ["流", "流"], ["暢", "畅"], ["淡", "淡"], ["入", "入"], ["影", "影"], ["音", "音"],
+      ["位", "位"], ["元", "元"], ["率", "率"], ["計", "计"], ["算", "算"], ["機", "机"],
+      ["讓", "让"], ["使", "使"], ["用", "用"], ["者", "者"], ["預", "预"], ["期", "期"],
+      ["解", "解"], ["析", "析"], ["度", "度"], ["禎", "帧"], ["格", "格"], ["自", "自"],
+      ["精", "精"], ["薦", "荐"], ["並", "并"], ["估", "估"], ["最", "最"], ["終", "终"],
+      ["壓", "压"], ["縮", "缩"], ["質", "质"], ["感", "感"], ["暗", "暗"], ["黑", "黑"],
+      ["藍", "蓝"], ["玻", "玻"], ["璃", "璃"], ["效", "效"], ["應", "应"], ["現", "现"],
+      ["代", "代"], ["旗", "旗"], ["艦", "舰"], ["站", "站"], ["介", "介"], ["支", "支"],
+      ["援", "援"], ["準", "准"], ["標", "标"], ["題", "题"], ["貼", "贴"], ["內", "内"],
+      ["容", "容"], ["清", "清"], ["理", "理"], ["啟", "启"], ["關", "关"], ["閉", "闭"],
+      ["變", "变"], ["發", "发"], ["萬", "万"], ["專", "专"], ["業", "业"], ["叢", "丛"],
+      ["東", "东"], ["絲", "丝"], ["兩", "两"], ["嚴", "严"], ["喪", "丧"], ["豐", "丰"],
+      ["臨", "临"], ["麗", "丽"], ["舉", "举"], ["義", "义"], ["烏", "乌"], ["樂", "乐"],
+      ["喬", "乔"], ["習", "习"], ["鄉", "乡"], ["書", "书"], ["買", "买"], ["亂", "乱"],
+      ["爭", "争"], ["虧", "亏"], ["雲", "云"], ["亞", "亚"], ["產", "产"], ["畝", "亩"],
+      ["親", "亲"], ["億", "亿"], ["僅", "仅"], ["從", "从"], ["倉", "仓"], ["儀", "仪"],
+      ["價", "价"], ["眾", "众"], ["優", "优"], ["傘", "伞"], ["偉", "伟"], ["傳", "传"],
+      ["傷", "伤"], ["倫", "伦"], ["偽", "伪"], ["餘", "余"], ["傭", "佣"], ["債", "债"],
+      ["傾", "倾"], ["儘", "尽"], ["兒", "儿"], ["兌", "兑"], ["冊", "册"], ["凍", "冻"],
+      ["凜", "凛"], ["幾", "几"], ["鳳", "凤"], ["凱", "凯"], ["別", "别"], ["刪", "删"],
+      ["剛", "刚"], ["劃", "划"], ["劇", "剧"], ["劉", "刘"], ["劍", "剑"], ["劑", "剂"],
+      ["勁", "劲"], ["務", "务"], ["勝", "胜"], ["勞", "劳"], ["勢", "势"], ["勳", "勋"],
+      ["勵", "励"], ["勸", "劝"], ["勻", "匀"], ["匯", "汇"], ["區", "区"], ["協", "协"],
+      ["卻", "却"], ["廠", "厂"], ["歷", "历"], ["厲", "厉"], ["厭", "厌"], ["廳", "厅"],
+      ["縣", "县"], ["參", "参"], ["雙", "双"], ["敘", "叙"], ["疊", "叠"], ["葉", "叶"],
+      ["嘆", "叹"], ["嘗", "尝"], ["嘔", "呕"], ["員", "员"], ["聽", "听"], ["啞", "哑"],
+      ["問", "问"], ["喚", "唤"], ["喪", "丧"], ["單", "单"], ["喲", "哟"], ["喚", "唤"],
+      ["圖", "图"], ["團", "团"], ["園", "园"], ["圓", "圆"], ["國", "国"], ["圍", "围"],
+      ["圖", "图"], ["聖", "圣"], ["場", "场"], ["壞", "坏"], ["塊", "块"], ["堅", "坚"],
+      ["壇", "坛"], ["壓", "压"], ["壘", "垒"], ["壙", "圹"], ["壯", "壮"], ["壺", "壶"],
+      ["壽", "寿"], ["夢", "梦"], ["夥", "伙"], ["夾", "夹"], ["奧", "奥"], ["婦", "妇"],
+      ["媽", "妈"], ["嫻", "娴"], ["嬌", "娇"], ["嬰", "婴"], ["學", "学"], ["寧", "宁"],
+      ["寶", "宝"], ["實", "实"], ["審", "审"], ["寫", "写"], ["寬", "宽"], ["將", "将"],
+      ["專", "专"], ["尋", "寻"], ["對", "对"], ["導", "导"], ["層", "层"], ["屬", "属"],
+      ["歲", "岁"], ["島", "岛"], ["峽", "峡"], ["嶄", "崭"], ["嶇", "岖"], ["巔", "巅"],
+      ["幣", "币"], ["師", "师"], ["帳", "帐"], ["帶", "带"], ["幀", "帧"], ["幫", "帮"],
+      ["庫", "库"], ["廁", "厕"], ["廂", "厢"], ["廈", "厦"], ["廚", "厨"], ["廟", "庙"],
+      ["廣", "广"], ["廢", "废"], ["開", "开"], ["異", "异"], ["棄", "弃"], ["張", "张"],
+      ["彌", "弥"], ["彎", "弯"], ["彈", "弹"], ["強", "强"], ["歸", "归"], ["錄", "录"],
+      ["彥", "彦"], ["徹", "彻"], ["徑", "径"], ["憶", "忆"], ["懷", "怀"], ["態", "态"],
+      ["總", "总"], ["恆", "恒"], ["惡", "恶"], ["惱", "恼"], ["愛", "爱"], ["愜", "惬"],
+      ["慣", "惯"], ["慶", "庆"], ["憂", "忧"], ["憐", "怜"], ["憑", "凭"], ["憲", "宪"],
+      ["懇", "恳"], ["應", "应"], ["戲", "戏"], ["戶", "户"], ["拋", "抛"], ["挾", "挟"],
+      ["捨", "舍"], ["掃", "扫"], ["揚", "扬"], ["換", "换"], ["揮", "挥"], ["損", "损"],
+      ["搖", "摇"], ["搗", "捣"], ["攝", "摄"], ["擁", "拥"], ["擇", "择"], ["擔", "担"],
+      ["據", "据"], ["擠", "挤"], ["擬", "拟"], ["攏", "拢"], ["攔", "拦"], ["攜", "携"],
+      ["攝", "摄"], ["敵", "敌"], ["數", "数"], ["斂", "敛"], ["斃", "毙"], ["斷", "断"],
+      ["於", "于"], ["無", "无"], ["舊", "旧"], ["昇", "升"], ["晝", "昼"], ["暈", "晕"],
+      ["暫", "暂"], ["曆", "历"], ["術", "术"], ["樸", "朴"], ["機", "机"], ["殺", "杀"],
+      ["雜", "杂"], ["權", "权"], ["條", "条"], ["來", "来"], ["楊", "杨"], ["極", "极"],
+      ["構", "构"], ["槍", "枪"], ["樣", "样"], ["樁", "桩"], ["樞", "枢"], ["標", "标"],
+      ["樓", "楼"], ["歡", "欢"], ["歐", "欧"], ["歲", "岁"], ["殘", "残"], ["殼", "壳"],
+      ["毀", "毁"], ["氈", "毡"], ["氣", "气"], ["漢", "汉"], ["湯", "汤"], ["溝", "沟"],
+      ["沒", "没"], ["澤", "泽"], ["潔", "洁"], ["潛", "潜"], ["潤", "润"], ["濃", "浓"],
+      ["濕", "湿"], ["濟", "济"], ["濤", "涛"], ["瀏", "浏"], ["瀘", "泸"], ["灣", "湾"],
+      ["滅", "灭"], ["燈", "灯"], ["靈", "灵"], ["爐", "炉"], ["點", "点"], ["煉", "炼"],
+      ["爺", "爷"], ["牆", "墙"], ["獨", "独"], ["獲", "获"], ["環", "环"], ["現", "现"],
+      ["瑪", "玛"], ["瓊", "琼"], ["電", "电"], ["畢", "毕"], ["畫", "画"], ["異", "异"],
+      ["療", "疗"], ["癡", "痴"], ["發", "发"], ["盜", "盗"], ["監", "监"], ["盤", "盘"],
+      ["盧", "卢"], ["眾", "众"], ["睏", "困"], ["矚", "瞩"], ["礎", "础"], ["禮", "礼"],
+      ["禪", "禅"], ["離", "离"], ["種", "种"], ["積", "积"], ["稱", "称"], ["穩", "稳"],
+      ["窩", "窝"], ["竅", "窍"], ["競", "竞"], ["筆", "笔"], ["築", "筑"], ["簡", "简"],
+      ["簽", "签"], ["籃", "篮"], ["類", "类"], ["糾", "纠"], ["紀", "纪"], ["約", "约"],
+      ["紅", "红"], ["紋", "纹"], ["納", "纳"], ["紐", "纽"], ["純", "纯"], ["紙", "纸"],
+      ["級", "级"], ["紛", "纷"], ["素", "素"], ["終", "终"], ["組", "组"], ["結", "结"],
+      ["絕", "绝"], ["統", "统"], ["絲", "丝"], ["絢", "绚"], ["綁", "绑"], ["經", "经"],
+      ["綜", "综"], ["綠", "绿"], ["維", "维"], ["網", "网"], ["綱", "纲"], ["綺", "绮"],
+      ["綻", "绽"], ["緊", "紧"], ["緒", "绪"], ["線", "线"], ["練", "练"], ["緻", "致"],
+      ["縈", "萦"], ["縣", "县"], ["縱", "纵"], ["總", "总"], ["績", "绩"], ["織", "织"],
+      ["繪", "绘"], ["繳", "缴"], ["續", "续"], ["纖", "纤"], ["罰", "罚"], ["羅", "罗"],
+      ["羈", "羁"], ["義", "义"], ["習", "习"], ["翹", "翘"], ["聖", "圣"], ["聞", "闻"],
+      ["聯", "联"], ["聰", "聪"], ["聲", "声"], ["聳", "耸"], ["膽", "胆"], ["臉", "脸"],
+      ["臟", "脏"], ["臨", "临"], ["舉", "举"], ["艙", "舱"], ["藝", "艺"], ["節", "节"],
+      ["蘇", "苏"], ["藥", "药"], ["蘭", "兰"], ["虛", "虚"], ["號", "号"], ["蟲", "虫"],
+      ["螢", "萤"], ["蠻", "蛮"], ["補", "补"], ["裝", "装"], ["裡", "里"], ["製", "制"],
+      ["複", "复"], ["見", "见"], ["規", "规"], ["視", "视"], ["覺", "觉"], ["覽", "览"],
+      ["觀", "观"], ["觸", "触"], ["訂", "订"], ["計", "计"], ["訊", "讯"], ["訓", "训"],
+      ["記", "记"], ["訣", "诀"], ["訪", "访"], ["設", "设"], ["許", "许"], ["訴", "诉"],
+      ["診", "诊"], ["詞", "词"], ["試", "试"], ["詩", "诗"], ["誠", "诚"], ["話", "话"],
+      ["該", "该"], ["詳", "详"], ["誇", "夸"], ["誌", "志"], ["認", "认"], ["誕", "诞"],
+      ["誘", "诱"], ["語", "语"], ["誤", "误"], ["說", "说"], ["課", "课"], ["調", "调"],
+      ["談", "谈"], ["請", "请"], ["諸", "诸"], ["諾", "诺"], ["謀", "谋"], ["謂", "谓"],
+      ["謎", "谜"], ["謝", "谢"], ["證", "证"], ["識", "识"], ["譜", "谱"], ["警", "警"],
+      ["譯", "译"], ["護", "护"], ["讚", "赞"], ["貝", "贝"], ["負", "负"], ["財", "财"],
+      ["責", "责"], ["貢", "贡"], ["貨", "货"], ["販", "贩"], ["貪", "贪"], ["貫", "贯"],
+      ["貴", "贵"], ["買", "买"], ["費", "费"], ["貼", "贴"], ["貿", "贸"], ["賀", "贺"],
+      ["賃", "赁"], ["賄", "贿"], ["資", "资"], ["賊", "贼"], ["賓", "宾"], ["賜", "赐"],
+      ["賞", "赏"], ["賠", "赔"], ["賣", "卖"], ["賤", "贱"], ["賦", "赋"], ["質", "质"],
+      ["賭", "赌"], ["購", "购"], ["贈", "赠"], ["贊", "赞"], ["趕", "赶"], ["趨", "趋"],
+      ["跡", "迹"], ["踐", "践"], ["蹤", "踪"], ["車", "车"], ["軌", "轨"], ["軍", "军"],
+      ["軟", "软"], ["載", "载"], ["較", "较"], ["輔", "辅"], ["輕", "轻"], ["輛", "辆"],
+      ["輝", "辉"], ["輩", "辈"], ["輪", "轮"], ["輯", "辑"], ["輸", "输"], ["轄", "辖"],
+      ["辭", "辞"], ["邊", "边"], ["遞", "递"], ["遠", "远"], ["違", "违"], ["遲", "迟"],
+      ["遷", "迁"], ["選", "选"], ["遺", "遗"], ["遼", "辽"], ["還", "还"], ["邁", "迈"],
+      ["鄉", "乡"], ["鄧", "邓"], ["鄭", "郑"], ["鄰", "邻"], ["醫", "医"], ["醜", "丑"],
+      ["釋", "释"], ["針", "针"], ["鈕", "钮"], ["鈣", "钙"], ["鈴", "铃"], ["鉛", "铅"],
+      ["銀", "银"], ["銅", "铜"], ["銷", "销"], ["銳", "锐"], ["鋒", "锋"], ["鋼", "钢"],
+      ["錄", "录"], ["錢", "钱"], ["錦", "锦"], ["錯", "错"], ["鍊", "炼"], ["鍵", "键"],
+      ["鎖", "锁"], ["鎮", "镇"], ["鏡", "镜"], ["鐘", "钟"], ["鐵", "铁"], ["鑑", "鉴"],
+      ["長", "长"], ["門", "门"], ["閃", "闪"], ["閉", "闭"], ["開", "开"], ["閒", "闲"],
+      ["間", "间"], ["閣", "阁"], ["閱", "阅"], ["隊", "队"], ["階", "阶"], ["陽", "阳"],
+      ["陰", "阴"], ["陣", "阵"], ["陸", "陆"], ["隻", "只"], ["雖", "虽"], ["雙", "双"],
+      ["雜", "杂"], ["雞", "鸡"], ["離", "离"], ["難", "难"], ["雲", "云"], ["電", "电"],
+      ["霧", "雾"], ["靜", "静"], ["頂", "顶"], ["項", "项"], ["順", "顺"], ["須", "须"],
+      ["頑", "顽"], ["頒", "颁"], ["預", "预"], ["領", "领"], ["頗", "颇"], ["頭", "头"],
+      ["頻", "频"], ["顆", "颗"], ["題", "题"], ["額", "额"], ["顏", "颜"], ["願", "愿"],
+      ["風", "风"], ["飛", "飞"], ["飯", "饭"], ["飲", "饮"], ["飾", "饰"], ["餓", "饿"],
+      ["館", "馆"], ["饒", "饶"], ["馬", "马"], ["馮", "冯"], ["駐", "驻"], ["駕", "驾"],
+      ["駛", "驶"], ["騎", "骑"], ["騙", "骗"], ["驚", "惊"], ["體", "体"], ["鬆", "松"],
+      ["鬥", "斗"], ["魚", "鱼"], ["鮮", "鲜"], ["鯨", "鲸"], ["鳥", "鸟"], ["鳴", "鸣"],
+      ["鴻", "鸿"], ["鵬", "鹏"], ["鹽", "盐"], ["麗", "丽"], ["麥", "麦"], ["黃", "黄"],
+      ["點", "点"], ["黨", "党"], ["齊", "齐"], ["齒", "齿"], ["齡", "龄"], ["龍", "龙"]
+    ];
+
+    const t2sMap = Object.fromEntries(t2sPairs);
+    const s2tMap = {};
+    for (const [traditional, simplified] of t2sPairs) {
+      if (!s2tMap[simplified]) s2tMap[simplified] = traditional;
+    }
+
+    const fontStyles = [
+      { name: "Special Neon", render: value => `✦ ${toFullWidth(value)} ✦` },
+      { name: "Cute Bubble", render: value => `♡ ${mapAlphaNum(value, "circled")} ♡` },
+      { name: "Sans Bold", render: value => mapAlphaNum(value, "sansBold") },
+      { name: "Serif Bold", render: value => mapAlphaNum(value, "serifBold") },
+      { name: "Mono Tech", render: value => mapAlphaNum(value, "monospace") },
+      { name: "Italic Flow", render: value => mapAlphaNum(value, "italic") },
+      { name: "Wide Space", render: value => spreadText(value) },
+      { name: "Soft Caption", render: value => `﹝ ${value} ﹞` },
+      { name: "Vapor Glow", render: value => `// ${toFullWidth(value).replaceAll(" ", "  ")} //` },
+      { name: "Launch Tag", render: value => `▰ ${value.toUpperCase()} ▰` }
+    ];
+
+    const fontMaps = {
+      sansBold: { upper: 0x1d5d4, lower: 0x1d5ee, digit: 0x1d7ec },
+      serifBold: { upper: 0x1d400, lower: 0x1d41a, digit: 0x1d7ce },
+      monospace: { upper: 0x1d670, lower: 0x1d68a, digit: 0x1d7f6 },
+      italic: { upper: 0x1d434, lower: 0x1d44e, digit: null },
+      circled: {
+        upper: "ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ",
+        lower: "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ",
+        digit: "⓪①②③④⑤⑥⑦⑧⑨"
+      }
+    };
+
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const panels = document.querySelectorAll(".panel");
+    const srtFile = document.getElementById("srtFile");
+    const srtRaw = document.getElementById("srtRaw");
+    const dropZone = document.getElementById("dropZone");
+    const srtFileStatus = document.getElementById("srtFileStatus");
+    const transcriptOutput = document.getElementById("transcriptOutput");
+    const transcriptMeta = document.getElementById("transcriptMeta");
+    const copyTranscript = document.getElementById("copyTranscript");
+    const scriptToggles = document.querySelectorAll(".script-toggle");
+    const socialInput = document.getElementById("socialInput");
+    const igSpacer = document.getElementById("igSpacer");
+    const clearSocial = document.getElementById("clearSocial");
+    const fontResults = document.getElementById("fontResults");
+    const videoSeconds = document.getElementById("videoSeconds");
+    const resolution = document.getElementById("resolution");
+    const fps = document.getElementById("fps");
+    const bitrateValue = document.getElementById("bitrateValue");
+    const bitrateNote = document.getElementById("bitrateNote");
+    const sizeValue = document.getElementById("sizeValue");
+    const sizeNote = document.getElementById("sizeNote");
+    const exportAdvice = document.getElementById("exportAdvice");
+    const toast = document.getElementById("toast");
+
+    navButtons.forEach(button => {
+      button.addEventListener("click", () => switchPanel(button.dataset.target));
+    });
+
+    scriptToggles.forEach(button => {
+      button.addEventListener("click", () => {
+        state.currentScript = button.dataset.script;
+        scriptToggles.forEach(toggle => toggle.classList.toggle("active", toggle === button));
+        renderTranscript();
+      });
+    });
+
+    srtFile.addEventListener("change", event => {
+      const [file] = event.target.files;
+      if (file) readSrtFile(file);
+    });
+
+    ["dragenter", "dragover"].forEach(eventName => {
+      dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(eventName => {
+      dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.remove("dragover");
+      });
+    });
+
+    dropZone.addEventListener("drop", event => {
+      const [file] = event.dataTransfer.files;
+      if (file) readSrtFile(file);
+    });
+
+    srtRaw.addEventListener("input", () => {
+      srtFileStatus.textContent = srtRaw.value.trim() ? "手動輸入" : "尚未載入";
+      updateTranscriptFromRaw();
+    });
+
+    copyTranscript.addEventListener("click", () => copyText(transcriptOutput.value, "純文字稿已複製"));
+    socialInput.addEventListener("input", renderFonts);
+    igSpacer.addEventListener("change", renderFonts);
+    clearSocial.addEventListener("click", () => {
+      socialInput.value = "";
+      renderFonts();
+      socialInput.focus();
+    });
+
+    [videoSeconds, resolution, fps].forEach(control => {
+      control.addEventListener("input", updateBitrate);
+      control.addEventListener("change", updateBitrate);
+    });
+
+    updateTranscriptFromRaw();
+    renderFonts();
+    updateBitrate();
+
+    function switchPanel(target) {
+      if (target === state.currentPanel) return;
+      state.currentPanel = target;
+
+      navButtons.forEach(button => {
+        button.classList.toggle("active", button.dataset.target === target);
+      });
+
+      panels.forEach(panel => {
+        const shouldShow = panel.dataset.panel === target;
+        if (shouldShow) {
+          panel.classList.add("active");
+          requestAnimationFrame(() => panel.classList.add("visible"));
+        } else {
+          panel.classList.remove("visible");
+          window.setTimeout(() => {
+            if (panel.dataset.panel !== state.currentPanel) panel.classList.remove("active");
+          }, 320);
+        }
+      });
+    }
+
+    function readSrtFile(file) {
+      if (!file.name.toLowerCase().endsWith(".srt") && file.type !== "text/plain") {
+        showToast("請選擇 .srt 字幕檔");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        srtRaw.value = String(reader.result || "");
+        srtFileStatus.textContent = file.name;
+        updateTranscriptFromRaw();
+        showToast("字幕檔已載入");
+      };
+      reader.onerror = () => showToast("檔案讀取失敗");
+      reader.readAsText(file, "utf-8");
+    }
+
+    function updateTranscriptFromRaw() {
+      state.transcriptTraditional = parseSrt(srtRaw.value);
+      renderTranscript();
+    }
+
+    function parseSrt(raw) {
+      return raw
+        .replace(/\ufeff/g, "")
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .filter(line => !/^\d+$/.test(line))
+        .filter(line => !/^\d{1,2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,.]\d{3}/.test(line))
+        .join("\n");
+    }
+
+    function renderTranscript() {
+      const text = state.currentScript === "simplified"
+        ? convertScript(state.transcriptTraditional, t2sMap)
+        : convertScript(state.transcriptTraditional, s2tMap);
+
+      transcriptOutput.value = text;
+      const lines = text ? text.split(/\n/).filter(Boolean).length : 0;
+      const chars = text.length;
+      transcriptMeta.textContent = text ? `${lines} 行字幕 · ${chars} 字元 · ${state.currentScript === "simplified" ? "簡體" : "繁體"}` : "等待字幕內容";
+    }
+
+    function convertScript(input, dictionary) {
+      if (!input) return "";
+      const keys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
+      let output = input;
+      for (const key of keys) {
+        output = output.split(key).join(dictionary[key]);
+      }
+      return output;
+    }
+
+    function renderFonts() {
+      const rawValue = socialInput.value || "";
+      const baseValue = igSpacer.checked ? applyIgSpacer(rawValue) : rawValue;
+      const value = baseValue || "CreatorHub";
+
+      fontResults.innerHTML = fontStyles.map((style, index) => {
+        const rendered = escapeHtml(style.render(value));
+        return `
+          <section class="font-card">
+            <div class="font-card-top">
+              <span class="font-name">${String(index + 1).padStart(2, "0")} · ${style.name}</span>
+              <button class="btn mini-copy" type="button" data-copy-index="${index}">複製</button>
+            </div>
+            <div class="font-preview">${rendered.replace(/\n/g, "<br>")}</div>
+          </section>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-copy-index]").forEach(button => {
+        button.addEventListener("click", () => {
+          const style = fontStyles[Number(button.dataset.copyIndex)];
+          copyText(style.render(value), `${style.name} 已複製`);
+        });
+      });
+    }
+
+    function applyIgSpacer(value) {
+      if (!value.trim()) return value;
+      return value
+        .split(/\r?\n/)
+        .map(line => line.trimEnd())
+        .join("\n\u2063\n");
+    }
+
+    function mapAlphaNum(value, styleName) {
+      const style = fontMaps[styleName];
+      if (!style) return value;
+
+      return Array.from(value).map(char => {
+        const code = char.codePointAt(0);
+        if (code >= 65 && code <= 90) {
+          const index = code - 65;
+          return typeof style.upper === "string"
+            ? style.upper[index]
+            : String.fromCodePoint(style.upper + index);
+        }
+        if (code >= 97 && code <= 122) {
+          const index = code - 97;
+          return typeof style.lower === "string"
+            ? style.lower[index]
+            : String.fromCodePoint(style.lower + index);
+        }
+        if (code >= 48 && code <= 57 && style.digit) {
+          const index = code - 48;
+          return typeof style.digit === "string"
+            ? style.digit[index]
+            : String.fromCodePoint(style.digit + index);
+        }
+        return char;
+      }).join("");
+    }
+
+    function toFullWidth(value) {
+      return Array.from(value).map(char => {
+        const code = char.codePointAt(0);
+        if (code === 32) return "　";
+        if (code >= 33 && code <= 126) return String.fromCodePoint(code + 0xfee0);
+        return char;
+      }).join("");
+    }
+
+    function spreadText(value) {
+      return Array.from(value)
+        .map(char => char === "\n" ? "\n" : `${char} `)
+        .join("")
+        .replace(/[ \t]+\n/g, "\n")
+        .trimEnd();
+    }
+
+    function updateBitrate() {
+      const seconds = Math.max(1, Number(videoSeconds.value) || 1);
+      if (Number(videoSeconds.value) < 1) videoSeconds.value = 1;
+
+      const config = bitrateTable[resolution.value][fps.value];
+      const sizeMb = (config.mbps * seconds) / 8;
+      const roundedSize = sizeMb >= 100 ? Math.round(sizeMb) : Number(sizeMb.toFixed(1));
+
+      bitrateValue.textContent = config.mbps;
+      bitrateNote.textContent = config.label;
+      sizeValue.textContent = roundedSize;
+      sizeNote.textContent = `${seconds} 秒影片的估算大小`;
+
+      const codecHint = resolution.value === "4K" ? "4K 建議優先使用 HEVC/H.265 或高品質 H.264。" : "1080p 適合多數短影音平台的快速發布。";
+      const motionHint = fps.value === "60" ? "60fps 需要較高位元率保留動態細節。" : "30fps 可在畫質與檔案大小間取得穩定平衡。";
+      exportAdvice.textContent = `${codecHint}${motionHint} 建議保留 ${config.mbps} Mbps 左右再上傳平台，降低二次壓縮造成的細節損失。`;
+    }
+
+    async function copyText(text, message) {
+      if (!text) {
+        showToast("目前沒有可複製的內容");
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const helper = document.createElement("textarea");
+          helper.value = text;
+          helper.setAttribute("readonly", "");
+          helper.style.position = "fixed";
+          helper.style.left = "-9999px";
+          document.body.appendChild(helper);
+          helper.select();
+          document.execCommand("copy");
+          helper.remove();
+        }
+        showToast(message);
+      } catch (error) {
+        showToast("複製失敗，請手動選取文字");
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(state.toastTimer);
+      state.toastTimer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
